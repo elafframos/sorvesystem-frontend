@@ -164,7 +164,7 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#6c5ce7' }}>
         <div style={{ ...styles.card, width: '350px', textAlign: 'center' }}>
-          <h2 style={{ marginBottom: '20px', color: '#6c5ce7' }}>🍦 SorveSystem</h2>
+          <h2 style={{ marginBottom: '20px', color: '#6c5ce7' }}>🍦 Picolé +</h2>
           
           <div style={{ textAlign: 'left', marginBottom: '15px' }}>
             <label style={{ fontSize: '14px', color: '#666', fontWeight: '600' }}>USUÁRIO</label>
