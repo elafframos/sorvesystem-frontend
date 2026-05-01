@@ -95,11 +95,12 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   if (carrinho.length === 0) return alert("Carrinho vazio!");
   
   const token = localStorage.getItem('token');
+  
+  // Calculamos os valores para salvar no estado local
+  const valorVenda = totalGeral;
 
-  // CORREÇÃO: Remova o objeto "vendas" e envie apenas a lista ou o objeto direto
-  // Se o seu Django salva um item por vez, o correto é:
   const itemParaVenda = {
-    produto: carrinho[0].id, // Pegando o ID do picolé
+    produto: carrinho[0].id,
     quantidade_vendida: carrinho[0].qtd,
     metodo: metodoPagamento,
     operador: operadorAtual,
@@ -113,17 +114,23 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
       'Content-Type': 'application/json',
       'Authorization': `Token ${token}`
     },
-    body: JSON.stringify(itemParaVenda) // Envia o objeto direto, sem o embrulho { vendas: ... }
+    body: JSON.stringify(itemParaVenda)
   })
   .then(async (res) => {
     if (res.ok) {
+      // ✅ ATUALIZAÇÃO AQUI: Salva a venda no turno para o relatório
+      const novaVendaParaEstado = {
+        metodo: metodoPagamento,
+        total: valorVenda
+      };
+      setVendasDoTurno([...vendasDoTurno, novaVendaParaEstado]);
+
       alert("✅ Venda realizada!");
       setCarrinho([]);
       setValorEntregue(0);
       if (aoVender) aoVender();
     } else {
       const erro = await res.json();
-      console.log("Dados enviados:", itemParaVenda); // Debug para você ver no console
       alert("Erro: " + JSON.stringify(erro));
     }
   });
@@ -153,6 +160,29 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
       setErroLogin(err.message);
     });
   };
+
+  const fecharCaixa = () => {
+  const totalPix = vendasDoTurno.filter(v => v.metodo === 'PIX').reduce((acc, v) => acc + v.total, 0);
+  const totalDinheiro = vendasDoTurno.filter(v => v.metodo === 'DIN').reduce((acc, v) => acc + v.total, 0);
+  const totalCartao = vendasDoTurno.filter(v => ['DEB', 'CRE'].includes(v.metodo)).reduce((acc, v) => acc + v.total, 0);
+  
+  const resumo = `
+    --- FECHAMENTO DE CAIXA ---
+    Operador: ${operadorAtual}
+    Fundo Inicial: R$ ${fundoCaixa.toFixed(2)}
+    
+    Vendas PIX: R$ ${totalPix.toFixed(2)}
+    Vendas Cartão: R$ ${totalCartao.toFixed(2)}
+    Vendas Dinheiro: R$ ${totalDinheiro.toFixed(2)}
+    
+    TOTAL NO CAIXA (Dinheiro + Fundo): R$ ${(fundoCaixa + totalDinheiro).toFixed(2)}
+    ---------------------------
+  `;
+
+  alert(resumo);
+  localStorage.clear();
+  window.location.href = "/"; // Desloga e limpa tudo
+};
 
   
 
@@ -215,9 +245,17 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h3>🍦 PDV Aberto - {operadorAtual}</h3>
+      <h3>🍦 PDV Aberto - {operadorAtual}</h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         <div style={{ color: '#00b894', fontWeight: 'bold' }}>Caixa: R$ {saldoEmDinheiro.toFixed(2)}</div>
-      </header>
+        <button 
+          onClick={fecharCaixa}
+          style={{ backgroundColor: '#ff7675', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          FECHAR CAIXA
+        </button>
+      </div>
+    </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
         <div style={styles.card}>
