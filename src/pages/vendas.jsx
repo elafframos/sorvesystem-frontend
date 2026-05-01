@@ -26,7 +26,7 @@ const styles = {
   trocoDestaque: {
     marginTop: '15px',
     padding: '15px',
-    backgroundColor: '#fff9db', // Amarelo suave para chamar atenção
+    backgroundColor: '#fff9db', 
     borderRadius: '10px',
     border: '1px solid #fab005',
     textAlign: 'center',
@@ -96,7 +96,7 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   
   const token = localStorage.getItem('token');
   
-  // Calculamos os valores para salvar no estado local
+  // Calculo dos valores para salvar no estado local
   const valorVenda = totalGeral;
 
   const itemParaVenda = {
@@ -118,16 +118,14 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   })
   .then(async (res) => {
     if (res.ok) {
-      // 1. Captura o valor total ANTES de limpar o carrinho
       const valorDaVendaAtual = totalGeral; 
 
-      // 2. Cria o objeto com a propriedade "total" (que o seu saldoEmDinheiro espera)
       const novaVendaParaEstado = {
         metodo: metodoPagamento,
         total: valorDaVendaAtual 
       };
 
-      // 3. Atualiza o estado das vendas do turno
+      // Atualiza o estado das vendas do turno
       setVendasDoTurno(prevVendas => [...prevVendas, novaVendaParaEstado]);
 
       alert("✅ Venda realizada!");
@@ -151,7 +149,6 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
     })
     .then(res => {
       if (res.ok) return res.json();
-      // Não diga se o erro foi na senha ou no usuário
       throw new Error('Usuário ou senha incorretos.'); 
     })
     .then(data => {
@@ -167,29 +164,38 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   };
 
   const fecharCaixa = () => {
+  
   const totalPix = vendasDoTurno.filter(v => v.metodo === 'PIX').reduce((acc, v) => acc + v.total, 0);
   const totalDinheiro = vendasDoTurno.filter(v => v.metodo === 'DIN').reduce((acc, v) => acc + v.total, 0);
-  const totalCartao = vendasDoTurno.filter(v => ['DEB', 'CRE'].includes(v.metodo)).reduce((acc, v) => acc + v.total, 0);
+  const totalDebito = vendasDoTurno.filter(v => v.metodo === 'DEB').reduce((acc, v) => acc + v.total, 0);
+  const totalCredito = vendasDoTurno.filter(v => v.metodo === 'CRE').reduce((acc, v) => acc + v.total, 0);
   
+  const totalVendasTurno = totalPix + totalDinheiro + totalDebito + totalCredito;
+  
+  const saldoEmEspecie = fundoCaixa + totalDinheiro;
+
   const resumo = `
-    --- FECHAMENTO DE CAIXA ---
+    --- RELATÓRIO FINAL DE FECHAMENTO ---
     Operador: ${operadorAtual}
     Fundo Inicial: R$ ${fundoCaixa.toFixed(2)}
     
     Vendas PIX: R$ ${totalPix.toFixed(2)}
-    Vendas Cartão: R$ ${totalCartao.toFixed(2)}
+    Vendas Débito: R$ ${totalDebito.toFixed(2)}
+    Vendas Crédito: R$ ${totalCredito.toFixed(2)}
     Vendas Dinheiro: R$ ${totalDinheiro.toFixed(2)}
     
-    TOTAL NO CAIXA (Dinheiro + Fundo): R$ ${(fundoCaixa + totalDinheiro).toFixed(2)}
-    ---------------------------
+    ===============================
+    TOTAL DE VENDAS (BRUTO): R$ ${totalVendasTurno.toFixed(2)}
+    TOTAL EM DINHEIRO NO CAIXA: R$ ${saldoEmEspecie.toFixed(2)}
+    ===============================
   `;
 
   alert(resumo);
-  localStorage.clear();
-  window.location.href = "/"; // Desloga e limpa tudo
-};
-
   
+  // Limpeza de sessão para o próximo operador
+  localStorage.clear();
+  window.location.href = "/";
+};
 
   const totalGeral = carrinho.reduce((acc, item) => acc + (item.preco * item.qtd), 0);
   const trocoCalculado = valorEntregue > totalGeral ? valorEntregue - totalGeral : 0;
