@@ -46,9 +46,13 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   const [operadorAtual, setOperadorAtual] = useState(localStorage.getItem('operador') || '');
   const [fundoCaixa, setFundoCaixa] = useState(Number(localStorage.getItem('fundo')) || 0);
   const [caixaAberto, setCaixaAberto] = useState(!!localStorage.getItem('operador'));
-  const [vendasDoTurno, setVendasDoTurno] = useState([]);
   const [senhaInput, setSenhaInput] = useState('');
   const [erroLogin, setErroLogin] = useState('');
+
+  const [vendasDoTurno, setVendasDoTurno] = useState(() => {
+  const salvo = localStorage.getItem('vendasDoTurno');
+  return salvo ? JSON.parse(salvo) : [];
+  });
 
   const adicionarAoCarrinho = (e) => {
     if (e) e.preventDefault(); // Impede o recarregamento da página
@@ -118,21 +122,24 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   })
   .then(async (res) => {
     if (res.ok) {
-      const valorDaVendaAtual = totalGeral; 
-
-      const novaVendaParaEstado = {
-        metodo: metodoPagamento,
-        total: valorDaVendaAtual 
-      };
-
-      // Atualiza o estado das vendas do turno
-      setVendasDoTurno(prevVendas => [...prevVendas, novaVendaParaEstado]);
+      const valorDaVendaAtual = totalGeral;
+      const novaVenda = { metodo: metodoPagamento, total: valorDaVendaAtual };
+      
+      // Atualiza o estado
+      const novaLista = [...vendasDoTurno, novaVenda];
+      setVendasDoTurno(novaLista);
+      
+      // ✅ ESSENCIAL: Salva no localStorage também para não perder se atualizar a página
+      localStorage.setItem('vendasDoTurno', JSON.stringify(novaLista));
 
       alert("✅ Venda realizada!");
       setCarrinho([]);
       setValorEntregue(0);
+      
       if (aoVender) aoVender();
-    } else {
+      } 
+      
+      else {
       const erro = await res.json();
       alert("Erro: " + JSON.stringify(erro));
     }
