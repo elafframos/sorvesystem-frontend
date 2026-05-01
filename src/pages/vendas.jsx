@@ -118,12 +118,17 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   })
   .then(async (res) => {
     if (res.ok) {
-      // ✅ ATUALIZAÇÃO AQUI: Salva a venda no turno para o relatório
+      // 1. Captura o valor total ANTES de limpar o carrinho
+      const valorDaVendaAtual = totalGeral; 
+
+      // 2. Cria o objeto com a propriedade "total" (que o seu saldoEmDinheiro espera)
       const novaVendaParaEstado = {
         metodo: metodoPagamento,
-        total: valorVenda
+        total: valorDaVendaAtual 
       };
-      setVendasDoTurno([...vendasDoTurno, novaVendaParaEstado]);
+
+      // 3. Atualiza o estado das vendas do turno
+      setVendasDoTurno(prevVendas => [...prevVendas, novaVendaParaEstado]);
 
       alert("✅ Venda realizada!");
       setCarrinho([]);
