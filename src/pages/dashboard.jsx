@@ -13,7 +13,6 @@ function Dashboard() {
   const [vendas, setVendas] = useState([]);
   const [erro, setErro] = useState(null);
 
-  // Formatação de Data Brasileira (Padrão ADS)
   const formatarData = (dataISO) => {
     if (!dataISO) return '';
     return new Intl.DateTimeFormat('pt-BR', {
@@ -38,7 +37,7 @@ function Dashboard() {
 
     fetch(`${import.meta.env.VITE_API_URL}/api/vendas/`, { 
       headers: {
-        'Authorization': `Token ${token}` // Adicione isso!
+        'Authorization': `Token ${token}` 
       }
     })
       .then(res => {
@@ -46,7 +45,7 @@ function Dashboard() {
         return res.json();
       })
       .then(data => {
-        // O Django REST Framework pode retornar { results: [] } se houver paginação
+        
         const listaVendas = Array.isArray(data) ? data : (data.results || []);
         
         const vendasOrdenadas = listaVendas.sort((a, b) => {

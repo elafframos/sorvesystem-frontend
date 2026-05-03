@@ -9,15 +9,14 @@ function App() {
   const [autenticado, setAutenticado] = useState(!!localStorage.getItem('operador'));
 
   const carregarDados = () => {
-  // ERRO ANTERIOR: localStorage.getItem('operador')
-  const token = localStorage.getItem('token'); // CORREÇÃO: Pegue o token real!
-  
-  if (!token) return; // Se não tem token, nem tenta a requisição
 
+  const token = localStorage.getItem('token'); 
+  
+  if (!token) return; 
   fetch(`${import.meta.env.VITE_API_URL}/api/produtos/`, { 
     method: 'GET',
     headers: {
-      'Authorization': `Token ${token}`, // Agora a chave está correta
+      'Authorization': `Token ${token}`, 
       'Content-Type': 'application/json'
     }
   })

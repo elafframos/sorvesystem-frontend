@@ -64,15 +64,15 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
 
 {/* Função para inserir o valor do botão no campo de código e focar*/}
 const inserirValor = (valor) => {
-    // 1. Primeiro atualizamos o texto no campo
+    
     setCodigoInput(valor); 
     
-    // 2. Usamos o setTimeout para garantir que o foco ocorra DEPOIS do texto aparecer
+   
     setTimeout(() => {
       if (inputCodigoRef.current) {
         inputCodigoRef.current.focus();
         
-        // Dica de mestre: Garante que o cursor vá para o FINAL do texto (depois do hífen)
+        
         const comprimento = inputCodigoRef.current.value.length;
         inputCodigoRef.current.setSelectionRange(comprimento, comprimento);
       }
@@ -159,7 +159,6 @@ const inserirValor = (valor) => {
       const novaLista = [...vendasDoTurno, novaVenda];
       setVendasDoTurno(novaLista);
       
-      // ✅ ESSENCIAL: Salva no localStorage também para não perder se atualizar a página
       localStorage.setItem('vendasDoTurno', JSON.stringify(novaLista));
 
       alert("✅ Venda realizada!");
@@ -351,7 +350,7 @@ const inserirValor = (valor) => {
       autoFocus 
       style={{ ...styles.input, flex: 1 }} 
     />
-    {/* Botão oculto apenas para permitir o Enter no formulário */}
+
     <button type="submit" style={{ display: 'none' }}>Adicionar</button>
   </form>
 
