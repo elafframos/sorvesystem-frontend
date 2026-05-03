@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function getCookie(name) {
   let cookieValue = null;
@@ -47,6 +47,8 @@ const styles = {
 };
 
 function Vendas({ produtos, aoVender, onLoginSuccess }) {
+  const inputCodigoRef = useRef(null);
+
   const [carrinho, setCarrinho] = useState([]);
   const [codigoLeitor, setCodigoLeitor] = useState('');
   const [quantidadeDesejada, setQuantidadeDesejada] = useState(1);
@@ -62,11 +64,20 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
 
 {/* Função para inserir o valor do botão no campo de código e focar*/}
 const inserirValor = (valor) => {
-  setCodigoInput(valor); 
-  
-  const campo = document.getElementById('campo-codigo');
-  if (campo) campo.focus();
-};
+    // 1. Primeiro atualizamos o texto no campo
+    setCodigoInput(valor); 
+    
+    // 2. Usamos o setTimeout para garantir que o foco ocorra DEPOIS do texto aparecer
+    setTimeout(() => {
+      if (inputCodigoRef.current) {
+        inputCodigoRef.current.focus();
+        
+        // Dica de mestre: Garante que o cursor vá para o FINAL do texto (depois do hífen)
+        const comprimento = inputCodigoRef.current.value.length;
+        inputCodigoRef.current.setSelectionRange(comprimento, comprimento);
+      }
+    }, 0);
+  };
 
   const [vendasDoTurno, setVendasDoTurno] = useState(() => {
   const salvo = localStorage.getItem('vendasDoTurno');
@@ -332,6 +343,7 @@ const inserirValor = (valor) => {
       style={{ ...styles.input, width: '70px' }} 
     />
     <input 
+      ref={inputCodigoRef}
       type="text" 
       placeholder="Código e Enter..." 
       value={codigoInput} 
