@@ -86,12 +86,13 @@ function Produtos({ produtos = [], aoAlterar }) {
 
       <div style={styles.card}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead><tr style={{ textAlign: 'left', color: '#666' }}><th>Cód</th><th>Sabor</th><th>Estoque</th><th>Ações</th></tr></thead>
+          <thead><tr style={{ textAlign: 'left', color: '#667' }}><th>Cód</th><th>Sabor</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr></thead>
           <tbody>
             {produtos.map(p => (
               <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '10px' }}>{p.codigo}</td>
                 <td><strong>{p.nome}</strong></td>
+                <td>R${p.preco}</td>
                 <td>{p.quantidade} un</td>
                 <td>
                   <button onClick={() => {setForm(p); setEditandoId(p.id)}} style={{ color: '#6c5ce7', background: 'none', border: 'none', cursor: 'pointer' }}>Editar</button>

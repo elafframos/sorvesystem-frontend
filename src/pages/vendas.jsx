@@ -33,7 +33,17 @@ const styles = {
     color: '#e67700',
     fontWeight: 'bold',
     fontSize: '18px'
-  }
+  },
+  buttonAtalho: {
+  padding: '10px 15px',
+  backgroundColor: '#f0f0f5',
+  border: '1px solid #d1d1e0',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  fontWeight: '600',
+  color: '#4a4a8c',
+  transition: '0.2s'
+},
 };
 
 function Vendas({ produtos, aoVender, onLoginSuccess }) {
@@ -48,6 +58,15 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   const [caixaAberto, setCaixaAberto] = useState(!!localStorage.getItem('operador'));
   const [senhaInput, setSenhaInput] = useState('');
   const [erroLogin, setErroLogin] = useState('');
+  const [codigoInput, setCodigoInput] = useState('');
+
+{/* Função para inserir o valor do botão no campo de código e focar*/}
+const inserirValor = (valor) => {
+  setCodigoInput(valor); 
+  
+  const campo = document.getElementById('campo-codigo');
+  if (campo) campo.focus();
+};
 
   const [vendasDoTurno, setVendasDoTurno] = useState(() => {
   const salvo = localStorage.getItem('vendasDoTurno');
@@ -58,7 +77,7 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
     if (e) e.preventDefault(); // Impede o recarregamento da página
 
     // .trim() remove espaços e String() garante que estamos comparando texto com texto
-    const codigoLimpo = String(codigoLeitor).trim();
+    const codigoLimpo = String(codigoInput).trim();
     
     if (!codigoLimpo) return;
 
@@ -89,7 +108,7 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
       
       // Limpa os campos para o próximo item
       setQuantidadeDesejada(1);
-      setCodigoLeitor('');
+      setCodigoInput('');
     } else { 
       alert(`Picolé com código "${codigoLimpo}" não encontrado!`); 
     }
@@ -212,7 +231,7 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#6c5ce7' }}>
         <div style={{ ...styles.card, width: '350px', textAlign: 'center' }}>
-          <h2 style={{ marginBottom: '20px', color: '#6c5ce7' }}>🍦 Picolé +</h2>
+          <h2 style={{ marginBottom: '20px', color: '#6c5ce7' }}>🍦 Picolé Super +</h2>
           
           <div style={{ textAlign: 'left', marginBottom: '15px' }}>
             <label style={{ fontSize: '14px', color: '#666', fontWeight: '600' }}>USUÁRIO</label>
@@ -263,50 +282,79 @@ function Vendas({ produtos, aoVender, onLoginSuccess }) {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-      <h3>🍦 PDV Aberto - {operadorAtual}</h3>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <div style={{ color: '#00b894', fontWeight: 'bold' }}>Caixa: R$ {saldoEmDinheiro.toFixed(2)}</div>
-        <button 
-          onClick={fecharCaixa}
-          style={{ backgroundColor: '#ff7675', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          FECHAR CAIXA
-        </button>
-      </div>
-    </header>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
-        <div style={styles.card}>
-          <form onSubmit={adicionarAoCarrinho} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-  <input 
-    type="number" 
-    value={quantidadeDesejada} 
-    onChange={(e) => setQuantidadeDesejada(Number(e.target.value))} 
-    style={{ ...styles.input, width: '70px' }} 
-  />
-  <input 
-    type="text" 
-    placeholder="Código e Enter..." 
-    value={codigoLeitor} 
-    onChange={(e) => setCodigoLeitor(e.target.value)} 
-    autoFocus 
-    style={{ ...styles.input, flex: 1 }} 
-  />
-  {/* Botão oculto apenas para permitir o Enter no formulário */}
-  <button type="submit" style={{ display: 'none' }}>Adicionar</button>
-</form>
-          <table style={styles.table}>
-            <tbody>
-              {carrinho.map(item => (
-                <tr key={item.id}>
-                  <td style={{ ...styles.td, borderRadius: '10px 0 0 10px' }}>{item.nome}</td>
-                  <td style={styles.td}>{item.qtd}x</td>
-                  <td style={{ ...styles.td, borderRadius: '0 10px 10px 0' }}>R$ {(item.qtd * item.preco).toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h3>🍦 PDV Aberto - {operadorAtual}</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ color: '#00b894', fontWeight: 'bold' }}>Caixa: R$ {saldoEmDinheiro.toFixed(2)}</div>
+          <button 
+            onClick={fecharCaixa}
+            style={{ backgroundColor: '#ff7675', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            FECHAR CAIXA
+          </button>
         </div>
+      </header>
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
+      <div style={styles.card}>
+
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+          <button 
+            type="button" 
+            onClick={() => inserirValor('609963522248-')}
+            style={styles.buttonAtalho}
+          >
+            Tradicional
+          </button>
+          
+          <button 
+            type="button" 
+            onClick={() => inserirValor('0618341945937-')}
+            style={styles.buttonAtalho}
+          >
+            Skimo
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => inserirValor('0618341945920-')}
+            style={
+              styles.buttonAtalho
+            }
+          >
+            Sorvete no Palito
+          </button>
+        </div>
+          
+  <form onSubmit={adicionarAoCarrinho} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+    <input 
+      type="number" 
+      value={quantidadeDesejada} 
+      onChange={(e) => setQuantidadeDesejada(Number(e.target.value))} 
+      style={{ ...styles.input, width: '70px' }} 
+    />
+    <input 
+      type="text" 
+      placeholder="Código e Enter..." 
+      value={codigoInput} 
+      onChange={(e) => setCodigoInput(e.target.value)} 
+      autoFocus 
+      style={{ ...styles.input, flex: 1 }} 
+    />
+    {/* Botão oculto apenas para permitir o Enter no formulário */}
+    <button type="submit" style={{ display: 'none' }}>Adicionar</button>
+  </form>
+
+      <table style={styles.table}>
+        <tbody>
+          {carrinho.map(item => (
+            <tr key={item.id}>
+              <td style={{ ...styles.td, borderRadius: '10px 0 0 10px' }}>{item.nome}</td>
+              <td style={styles.td}>{item.qtd}x</td>
+              <td style={{ ...styles.td, borderRadius: '0 10px 10px 0' }}>R$ {(item.qtd * item.preco).toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+  </div>
 
         <div style={{ ...styles.card, backgroundColor: '#f9f9ff' }}>
   <h4>Total</h4>
