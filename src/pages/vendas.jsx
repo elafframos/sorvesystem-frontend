@@ -129,54 +129,49 @@ const inserirValor = (valor) => {
   if (carrinho.length === 0) return alert("Carrinho vazio!");
   
   const token = localStorage.getItem('token');
-  
-  // Calculo dos valores para salvar no estado local
-  const valorVenda = totalGeral;
 
-  const itemParaVenda = {
-    produto: carrinho[0].id,
-    quantidade_vendida: carrinho[0].qtd,
-    metodo: metodoPagamento,
-    operador: operadorAtual,
-    valor_recebido: metodoPagamento === 'DIN' ? valorEntregue : totalGeral,
-    troco: metodoPagamento === 'DIN' ? trocoCalculado : 0
-  };
+  const requisicoes = carrinho.map(item => {
+    const itemParaVenda = {
+      produto: item.id, 
+      quantidade_vendida: item.qtd,
+      metodo: metodoPagamento,
+      operador: operadorAtual,
+      valor_recebido: metodoPagamento === 'DIN' ? valorEntregue : totalGeral,
+      troco: metodoPagamento === 'DIN' ? trocoCalculado : 0
+    };
 
-  fetch(`${import.meta.env.VITE_API_URL}/api/vendas/`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Token ${token}`
-    },
-    body: JSON.stringify(itemParaVenda)
-  })
-  .then(async (res) => {
-    if (res.ok) {
-      const valorDaVendaAtual = totalGeral;
-      const novaVenda = { metodo: metodoPagamento, total: valorDaVendaAtual };
-      
-      // Atualiza o estado
-      const novaLista = [...vendasDoTurno, novaVenda];
-      setVendasDoTurno(novaLista);
-      
-      localStorage.setItem('vendasDoTurno', JSON.stringify(novaLista));
-
-      alert("✅ Venda realizada!");
-      setCarrinho([]);
-      setValorEntregue(0);
-      
-      if (aoVender) aoVender();
-      } 
-      
-      else {
-      const erro = await res.json();
-      alert("Erro: " + JSON.stringify(erro));
-    }
+    return fetch(`${import.meta.env.VITE_API_URL}/api/vendas/`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Token ${token}`
+      },
+      body: JSON.stringify(itemParaVenda)
+    });
   });
+
+  Promise.all(requisicoes)
+    .then(respostas => {
+      if (respostas.every(res => res.ok)) {
+        alert("✅ Venda finalizada e estoque atualizado!");
+        
+        const novaVenda = { metodo: metodoPagamento, total: totalGeral };
+        const novaLista = [...vendasDoTurno, novaVenda];
+        setVendasDoTurno(novaLista);
+        localStorage.setItem('vendasDoTurno', JSON.stringify(novaLista));
+
+        setCarrinho([]);
+        setValorEntregue(0);
+        if (aoVender) aoVender();
+      } else {
+        alert("⚠️ Ocorreu um erro ao dar baixa em algum item. Verifique o estoque.");
+      }
+    })
+    .catch(err => alert("Erro crítico na venda: " + err));
 };
 
   const validarLoginNoDjango = () => {
-    setErroLogin(''); // Limpa erro anterior
+    setErroLogin(''); 
 
     fetch(`${import.meta.env.VITE_API_URL}/api/login/`, {
       method: 'POST',
